@@ -1,0 +1,3 @@
+Python=3.8
+celery=5.3.4
+django-celery-beat=2.4.0
