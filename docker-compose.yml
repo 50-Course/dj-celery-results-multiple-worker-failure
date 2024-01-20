@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3.8-management"
+    ports:
+      - 5672:5672
+    network:
+      - simulated_network
+
+  celery_instance_A:
+    build:
+        context: .
+    container_name: 'celery_instance_A'
+    depends_on:
+      - rabbitmq
+    network:
+      - simulated_network
+
+  celery_instance_B:
+    build:
+        context: .
+    container_name: 'celery_instance_B'
+    depends_on:
+      - rabbitmq
+    network:
+      - simulated_network
+
+networks:
+  simulated_network:
+    driver: bridge
+
