@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  web:
+    build:
+      - context: .
+    container_name: web 
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    network:
+      - simulated_network
+
   rabbitmq:
     image: "rabbitmq:3.8-management"
     ports:
@@ -12,6 +23,7 @@ services:
     build:
         context: .
     container_name: 'celery_instance_A'
+    command: bash -c "celery -A [celery worker project] worker --loglevel=info"
     depends_on:
       - rabbitmq
     network:
@@ -21,6 +33,7 @@ services:
     build:
         context: .
     container_name: 'celery_instance_B'
+    command: bash -c "celery -A [celery worker project] worker --loglevel=info"
     depends_on:
       - rabbitmq
     network:
@@ -30,3 +43,5 @@ networks:
   simulated_network:
     driver: bridge
 
+volumes:
+  data:
