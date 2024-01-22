@@ -1,13 +1,4 @@
-FROM python:3.8
-
-# We don't want to run our application as root
-ARG USER_ID=1000
-ARG GROUP_ID={USER_ID}
-
-# Create a group and user to run our application
-RUN groupadd -g ${GROUP_ID} appuser && \
-    useradd -r -u ${USER_ID} -g appuser appuser
-
+FROM python:3.8-slim-buster
 
 # Set the working directory to /app
 WORKDIR /app
@@ -24,6 +15,4 @@ RUN pip install -r requirements.txt
 # Make port 80 available to the world outside this container
 EXPOSE 8000
 
-# Run app.py when the container launches
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 

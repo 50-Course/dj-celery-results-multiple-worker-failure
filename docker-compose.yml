@@ -1,47 +1,39 @@
-version: '3'
+version: '3.8'
 
 services:
   web:
-    build:
-      - context: .
-    container_name: web 
+    build: .
+    container_name: 'web'
     ports:
       - 8000:8000
     volumes:
       - .:/app
-    network:
-      - simulated_network
 
   rabbitmq:
     image: "rabbitmq:3.8-management"
+    container_name: 'mq'
     ports:
       - 5672:5672
-    network:
-      - simulated_network
-
-  celery_instance_A:
-    build:
-        context: .
-    container_name: 'celery_instance_A'
-    command: bash -c "celery -A [celery worker project] worker --loglevel=info"
-    depends_on:
-      - rabbitmq
-    network:
-      - simulated_network
-
-  celery_instance_B:
-    build:
-        context: .
-    container_name: 'celery_instance_B'
-    command: bash -c "celery -A [celery worker project] worker --loglevel=info"
-    depends_on:
-      - rabbitmq
-    network:
-      - simulated_network
-
-networks:
-  simulated_network:
-    driver: bridge
-
+      
+  # celery_instance_A:
+  #   build:
+  #       context: .
+  #   container_name: 'celery_instance_A'
+  #   command: bash -c "celery -A [celery worker project] worker --loglevel=info"
+  #   depends_on:
+  #     - rabbitmq
+  #   network:
+  #     - simulated_network
+  #
+  # celery_instance_B:
+  #   build:
+  #       context: .
+  #   container_name: 'celery_instance_B'
+  #   command: bash -c "celery -A [celery worker project] worker --loglevel=info"
+  #   depends_on:
+  #     - rabbitmq
+  #   network:
+  #     - simulated_network
+  #
 volumes:
   data:
