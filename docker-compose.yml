@@ -4,7 +4,13 @@ services:
   projectA:
     build: 
       context: ./projectA
-    container_name: 'web'
+    container_name: projectA
+    command: >
+      sh -c "
+      python manage.py makemigrations --no-input &&
+      python manage.py migrate django_celery_results &&
+      python manage.py runserver 0.0.0.0:8000
+      "
     depends_on:
       - db
       - rabbitmq
@@ -16,10 +22,16 @@ services:
   projectB:
     build: 
       context: ./projectB
-    container_name: 'web'
+    container_name: projectB
     depends_on:
       - db
       - rabbitmq
+    command: >
+      sh -c "
+      python manage.py makemigrations --no-input &&
+      python manage.py migrate django_celery_results &&
+      python manage.py runserver 0.0.0.0:8001
+      "
     ports:
       - 8001:8001
     volumes:
