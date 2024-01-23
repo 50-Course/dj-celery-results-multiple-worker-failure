@@ -1,71 +1,68 @@
 version: '3.8'
 
 services:
-  projectA:
-    build: 
+  projecta:
+    build:
       context: ./projectA
-    container_name: projectA
-    command: >
-      sh -c "
-      python manage.py makemigrations --no-input &&
-      python manage.py migrate django_celery_results &&
-      python manage.py runserver 0.0.0.0:8000
-      "
+      dockerfile: Dockerfile
+    container_name: project_a
+    command: sh -c "python manage.py makemigrations --no-input && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
       - rabbitmq
     ports:
       - 8000:8000
     volumes:
-      - .:/app
+      - ./projectA:/app
 
-  projectB:
-    build: 
+  projectb:
+    build:
       context: ./projectB
-    container_name: projectB
+      dockerfile: Dockerfile
+    container_name: project_b
     depends_on:
       - db
       - rabbitmq
-    command: >
-      sh -c "
-      python manage.py makemigrations --no-input &&
-      python manage.py migrate django_celery_results &&
-      python manage.py runserver 0.0.0.0:8001
-      "
+    command: sh -c "python manage.py makemigrations --no-input && python manage.py migrate && python manage.py runserver 0.0.0.0:8001"
     ports:
       - 8001:8001
     volumes:
-      - .:/app
+      - ./projectB:/app
 
   rabbitmq:
     image: "rabbitmq:3.8-management"
     container_name: 'mq'
     ports:
       - 5672:5672
-    
+
   db:
-    image: postgres:14.5-alphine
+    image: postgres:14.5-alpine
     container_name: main_db
     ports:
-      - 5432
+      - 5432:5432  
     volumes:
       - "data:/var/lib/postgresql/data"
-      
-  celery_instance_A:
+    environment:
+      POSTGRES_USER: postgrey
+      POSTGRES_PASSWORD: postgrey
+      POSTGRES_DB: postgres
+
+  celery_instance_a:
     build:
-        context: .
-    container_name: 'celery_instance_A'
-    command: sh -c "celery -A projectA worker --loglevel=info"
+      context: ./projectA  
+    container_name: 'celery_instance_a'
+    command: celery -A projectA worker --loglevel=info
     depends_on:
       - rabbitmq
 
-  celery_instance_B:
+  celery_instance_b:
     build:
-        context: .
-    container_name: 'celery_instance_B'
-    command: sh -c "celery -A projectB worker --loglevel=info"
+      context: ./projectB 
+    container_name: 'celery_instance_b'
+    command: celery -A projectB worker --loglevel=info
     depends_on:
       - rabbitmq
 
 volumes:
   data:
+

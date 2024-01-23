@@ -18,7 +18,7 @@ def print_tree(*args, **kwargs=None):
 
 @shared_task
 def say_hello(count=10) -> None:
-    for i in range(count):
+    for _ in range(count):
         print('Hello, world!')
     
 
