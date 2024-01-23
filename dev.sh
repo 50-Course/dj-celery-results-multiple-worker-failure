@@ -29,7 +29,7 @@ stop_server() {
 # rebuild the dev environment
 rebuild_server() {
     echo "${GREEN}Rebuilding the dev environment${NC}"
-    docker compose build
+    docker compose build --no-cache
     run_server
 }
 

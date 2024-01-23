@@ -1,11 +1,27 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
+  projectA:
+    build: 
+      context: ./projectA
     container_name: 'web'
+    depends_on:
+      - db
+      - rabbitmq
     ports:
       - 8000:8000
+    volumes:
+      - .:/app
+
+  projectB:
+    build: 
+      context: ./projectB
+    container_name: 'web'
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - 8001:8001
     volumes:
       - .:/app
 
@@ -14,26 +30,30 @@ services:
     container_name: 'mq'
     ports:
       - 5672:5672
+    
+  db:
+    image: postgres:14.5-alphine
+    container_name: main_db
+    ports:
+      - 5432
+    volumes:
+      - "data:/var/lib/postgresql/data"
       
-  # celery_instance_A:
-  #   build:
-  #       context: .
-  #   container_name: 'celery_instance_A'
-  #   command: bash -c "celery -A [celery worker project] worker --loglevel=info"
-  #   depends_on:
-  #     - rabbitmq
-  #   network:
-  #     - simulated_network
-  #
-  # celery_instance_B:
-  #   build:
-  #       context: .
-  #   container_name: 'celery_instance_B'
-  #   command: bash -c "celery -A [celery worker project] worker --loglevel=info"
-  #   depends_on:
-  #     - rabbitmq
-  #   network:
-  #     - simulated_network
-  #
+  celery_instance_A:
+    build:
+        context: .
+    container_name: 'celery_instance_A'
+    command: sh -c "celery -A projectA worker --loglevel=info"
+    depends_on:
+      - rabbitmq
+
+  celery_instance_B:
+    build:
+        context: .
+    container_name: 'celery_instance_B'
+    command: sh -c "celery -A projectB worker --loglevel=info"
+    depends_on:
+      - rabbitmq
+
 volumes:
   data:
